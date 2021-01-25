@@ -14,8 +14,6 @@ export const apiUrl = `${window.location.protocol}//${
   window.location.hostname
 }${window.location.hostname === "localhost" ? ":" + ports.serverPort : ""}`;
 
-console.log(apiUrl);
-
 export const feedbackStatusMapping = [
   "Unconfirmed",
   "Complaint",
