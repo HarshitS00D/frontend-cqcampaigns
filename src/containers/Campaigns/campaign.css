@@ -1,0 +1,9 @@
+.card-footer {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.card-footer :not(:last-child) {
+  margin-right: 5px;
+}

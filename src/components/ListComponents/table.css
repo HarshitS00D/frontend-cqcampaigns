@@ -1,0 +1,27 @@
+th {
+  font-size: 1.1rem;
+  background-color: #ddf3fd !important;
+}
+
+/* .ant-table-column-sorter-inner {
+  color: #001529;
+} */
+
+.table-list-name-col {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+tr:hover .link {
+  display: block;
+}
+
+.editable-cell-value-wrap {
+  width: 90%;
+  padding-right: 24;
+}
+
+.link {
+  display: none;
+}

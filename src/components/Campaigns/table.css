@@ -1,0 +1,12 @@
+th {
+  font-size: 1.1rem;
+  background-color: #ddf3fd !important;
+}
+
+tr:hover .link {
+  display: block;
+}
+
+.link {
+  display: none;
+}

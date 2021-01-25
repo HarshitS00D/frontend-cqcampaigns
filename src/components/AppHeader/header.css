@@ -1,0 +1,25 @@
+.header {
+  background: #414756 !important;
+}
+
+.logo {
+  font-size: 28px;
+  color: white;
+}
+.logo span {
+  font-size: 30px;
+  font-weight: bold;
+  color: #ff6f31;
+}
+
+.header-content {
+  font-size: 20px;
+  color: white;
+  display: flex;
+  align-items: center;
+}
+
+.header-content span {
+  margin: 0 5px;
+  cursor: pointer;
+}
