@@ -10,11 +10,11 @@ export const ports = {
   reactPort: "3000",
 };
 
-export const apiUrl = `http://${window.location.hostname}:${
-  window.location.port === ports.reactPort
-    ? ports.serverPort
-    : window.location.port
-}`;
+export const apiUrl = `${window.location.protocol}//${
+  window.location.hostname
+}${window.location.hostname === "localhost" ? ":" + ports.serverPort : ""}`;
+
+console.log(apiUrl);
 
 export const feedbackStatusMapping = [
   "Unconfirmed",
