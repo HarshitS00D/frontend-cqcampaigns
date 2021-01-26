@@ -69,7 +69,7 @@ function getChartdata(userAnalyticsData) {
     data.push({ type: "bounced", y: 0, x: months[i] });
     visited[i] = true;
   }
-  console.log(data);
+
   return data;
 }
 
