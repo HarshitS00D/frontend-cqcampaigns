@@ -146,6 +146,7 @@ class CampaignsTable extends React.Component {
         key: "name",
         dataIndex: "name",
         ...defaultSearchComponent(this, "name"),
+        width: "20%",
       },
       {
         title: "Created At",
@@ -155,26 +156,54 @@ class CampaignsTable extends React.Component {
         sorter: (a, b) => getDiffInMilliseconds(a.createdAt, b.createdAt),
         sortOrder: sortedInfo.columnKey === "createdAt" && sortedInfo.order,
         ellipsis: true,
-        width: "26%",
-      },
-      {
-        title: "Updated At",
-        key: "updatedAt",
-        dataIndex: "updatedAt",
-        render: (val) => parseTimeStamp(val, "MMMM Do YYYY, h:mm:ss a"),
-        sorter: (a, b) => getDiffInMilliseconds(a.updatedAt, b.updatedAt),
-        sortOrder: sortedInfo.columnKey === "updatedAt" && sortedInfo.order,
-        ellipsis: true,
-        width: "26%",
+        width: "15%",
       },
     ];
 
     if (tableData && tableData.length) {
+      columns.splice(
+        1,
+        0,
+        {
+          title: "Sent",
+          key: "sent",
+          dataIndex: "sent",
+          render: (val, record) => record.analytics.sent,
+          align: "center",
+          //  width: "5%",
+        },
+        {
+          title: "Delivered",
+          key: "delivered",
+          render: (val, record) => record.analytics.delivered,
+          dataIndex: "delivered",
+          align: "center",
+          //  width: "8%",
+        },
+        {
+          title: "Bounced",
+          key: "bounced",
+          dataIndex: "bounced",
+          render: (val, record) => record.analytics.bounced,
+          align: "center",
+          // width: "8%",
+        },
+        {
+          title: "Opened",
+          key: "open",
+          dataIndex: "open",
+          render: (val, record) => record.analytics.open,
+          align: "center",
+          //  width: "8%",
+        }
+      );
       columns.push({
         title: "Actions",
         key: "actions",
         dataIndex: "actions",
+        width: "10%",
         fixed: "right",
+        align: "center",
         render: (val, record) => (
           <Link to={{ state: record, pathname: `/campaigns/${record._id}` }}>
             Manage
