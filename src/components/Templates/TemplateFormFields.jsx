@@ -4,8 +4,8 @@ import { Form, Row, Col, Input, Radio, Checkbox } from "antd";
 import Quill from "../quill";
 
 const initialValues = {
-  bodyType: 1,
-  analytics: [2],
+  bodyType: 0,
+  analytics: [],
   templateName: null,
   body: null,
   htmlBody: null,
