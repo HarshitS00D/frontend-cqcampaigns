@@ -225,11 +225,15 @@ class EditableTable extends React.Component {
 
     if (_.findIndex(tableData, { _id: row._id, name: row.name }) !== -1) return;
 
+    this.setState({ onLoading: true });
+
     const select = ["name", "createdAt", "updatedAt", "total"];
     const onSuccess = (data) => {
+      this.setState({ onLoading: false });
       message.success(data);
     };
     const onError = (err) => {
+      this.setState({ onLoading: false });
       message.error(err.response.data.error);
       console.log({ err });
     };
