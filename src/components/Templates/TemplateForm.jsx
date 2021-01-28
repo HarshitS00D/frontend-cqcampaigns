@@ -52,7 +52,7 @@ const TemplateForm = (props) => {
         bodyType: 0,
         analytics: [],
       });
-      return props.history.push("/templates/");
+      return props.history.goBack();
     };
     const onError = (err) => message.error("Some Error Occured", 1);
     dispatch(

@@ -12,17 +12,6 @@ export const createUser = (args = {}) => async () => {
   }
 };
 
-export const changePassword = (args = {}) => async (dispatch) => {
-  const { userID, payload, onError, onSuccess } = args;
-  try {
-    const response = await axios.patch(`/api/user/${userID}`, payload);
-    if (onSuccess) onSuccess(response.data);
-  } catch (error) {
-    console.log({ error });
-    if (onError) onError(error.response.data);
-  }
-};
-
 export const getUsers = (args = {}) => async (dispatch) => {
   const { filters, pagination, callback } = args;
   try {
@@ -33,6 +22,17 @@ export const getUsers = (args = {}) => async (dispatch) => {
     dispatch({ type: FETCH_USERS, payload: response.data });
   } catch (error) {
     console.log({ error });
+  }
+};
+
+export const editUser = (args = {}) => async (dispatch) => {
+  const { userID, payload, onError, onSuccess } = args;
+  try {
+    const response = await axios.patch(`/api/user/${userID}`, payload);
+    if (onSuccess) onSuccess(response.data);
+  } catch (error) {
+    console.log({ error });
+    if (onError) onError(error.response.data);
   }
 };
 

@@ -21,7 +21,7 @@ class TemplateTable extends React.Component {
     sortedInfo: {},
     selectedRowKeys: [],
     onLoading: false,
-    filters: {},
+    filters: { campaignID: { $eq: null } },
     pageSize: 10,
     pageNo: 1,
   };
@@ -84,7 +84,7 @@ class TemplateTable extends React.Component {
 
   handleSearchReset = (clearFilters) => {
     clearFilters();
-    this.setState({ searchText: "", filters: {} });
+    this.setState({ searchText: "", filters: { campaignID: { $eq: null } } });
   };
 
   onSelectedRowsDelete = () => {
@@ -175,6 +175,7 @@ class TemplateTable extends React.Component {
             </Link>
           </span>
         ),
+        width: "26%",
         ...defaultSearchComponent(this, "name"),
       },
       {
@@ -237,7 +238,6 @@ class TemplateTable extends React.Component {
           scroll={{ x: true, y: 600 }}
           columns={columns}
           rowSelection={rowSelection}
-          tableLayout="auto"
           dataSource={tableData}
           pagination={{
             showSizeChanger: true,

@@ -1,15 +1,16 @@
 import React from "react";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
-import { Table, Button, message, Typography } from "antd";
+import { Table, Button, message, Typography, Select } from "antd";
 import _ from "lodash";
 
 import {
   deleteUsers,
   clearUsers,
   getUsers,
+  editUser,
 } from "../../actions/AccountActions";
-import { roles } from "../../utils/static_vars";
+import { rolesArray, rolesMapping } from "../../utils/static_vars";
 import { getDiffInMilliseconds, parseTimeStamp } from "../../utils/moment";
 import ChangePasswordModal from "./ChangePasswordModal";
 
@@ -25,6 +26,7 @@ class UserTable extends React.Component {
     pageSize: 5,
     pageNo: 1,
     ChangePasswordModalVisible: false,
+    //isRoleChangeLoading: false,
     userID: null,
   };
 
@@ -138,9 +140,34 @@ class UserTable extends React.Component {
     });
   };
 
+  onRoleChange = (role, record) => {
+    // this.setState({ isRoleChangeLoading: true });
+    const onSuccess = (data) => {
+      message.success(data);
+      //  this.setState({ isRoleChangeLoading: false });
+      this.dispatchFetchUsers();
+    };
+    const onError = (data) => {
+      message.error(data);
+      // this.setState({ isRoleChangeLoading: false });
+    };
+    this.props.editUser({
+      userID: record._id,
+      payload: { role },
+      onSuccess,
+      onError,
+    });
+  };
+
   render() {
-    const { selectedRowKeys, onLoading, pageNo, sortedInfo } = this.state;
-    const { tableData, total } = this.props;
+    const {
+      selectedRowKeys,
+      onLoading,
+      pageNo,
+      sortedInfo,
+      // isRoleChangeLoading,
+    } = this.state;
+    const { tableData, total, user } = this.props;
 
     const rowSelection = {
       selectedRowKeys,
@@ -168,7 +195,27 @@ class UserTable extends React.Component {
         title: "Role",
         key: "role",
         dataIndex: "role",
-        render: (val) => roles[val].label,
+        align: "center",
+        render: (val, record) => (
+          <Select
+            onChange={(newVal) => this.onRoleChange(newVal, record)}
+            loading={false}
+            defaultValue={val}
+            style={{ width: "160px" }}
+            // loading={isRoleChangeLoading}
+            disabled={user._id === record._id}
+          >
+            {rolesArray.map((role, i) => (
+              <Select.Option
+                value={rolesMapping[role]}
+                key={i}
+                disabled={rolesMapping[role] === record.role}
+              >
+                {role}
+              </Select.Option>
+            ))}
+          </Select>
+        ),
       },
       {
         title: "Created At",
@@ -262,11 +309,12 @@ class UserTable extends React.Component {
   }
 }
 
-const mapStateToProps = ({ users }, ownProps) => {
+const mapStateToProps = ({ users, session }, ownProps) => {
   return {
     ...ownProps,
     tableData: users.data,
     total: users.total,
+    user: session.user,
   };
 };
 
@@ -274,4 +322,5 @@ export default connect(mapStateToProps, {
   clearUsers,
   deleteUsers,
   getUsers,
+  editUser,
 })(withRouter(UserTable));

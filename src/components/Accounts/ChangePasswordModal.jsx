@@ -5,7 +5,7 @@ import { LockTwoTone } from "@ant-design/icons";
 
 import { hashCrypt } from "../../utils/bcrypt";
 import { regularExpressions } from "../../utils/static_vars";
-import { changePassword } from "../../actions/AccountActions";
+import { editUser } from "../../actions/AccountActions";
 
 const ChangePasswordModal = (props) => {
   const { ChangePasswordModalVisible, changeParentState, userID } = props;
@@ -42,7 +42,7 @@ const ChangePasswordModal = (props) => {
       ]);
     };
 
-    dispatch(changePassword({ userID, payload: data, onSuccess, onError }));
+    dispatch(editUser({ userID, payload: data, onSuccess, onError }));
   };
 
   const handleCancel = () => {
@@ -62,7 +62,7 @@ const ChangePasswordModal = (props) => {
       closable={false}
     >
       <Form
-        style={{ background: "white", padding: "2.2rem" }}
+        style={{ background: "white" }}
         form={form}
         onFinish={onFormSubmit}
         layout="vertical"

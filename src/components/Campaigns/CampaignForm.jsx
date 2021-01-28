@@ -5,7 +5,7 @@ import { AutoComplete, Form, Input, Button, message } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import _ from "lodash";
 
-import { fetchTemplates, editTemplate } from "../../actions/templateActions";
+import { fetchTemplates } from "../../actions/templateActions";
 import { fetchUserLists } from "../../actions/listActions";
 import { createCampaign } from "../../actions/campaignActions";
 import TemplateFormFields from "../Templates/TemplateFormFields";
@@ -23,7 +23,7 @@ const CampaignForm = (props) => {
   const [selectedList, setSelectedList] = useState();
 
   useEffect(() => {
-    dispatch(fetchTemplates());
+    dispatch(fetchTemplates({ filters: { campaignID: { $eq: null } } }));
     dispatch(fetchUserLists());
   }, [dispatch]);
 
@@ -65,21 +65,10 @@ const CampaignForm = (props) => {
     name: values.templateName,
   });
 
-  const getInitialTemplateValues = () =>
-    _.pick(templates[selectedTemplate.index], [
-      "analytics",
-      "bodyType",
-      "body",
-      "name",
-      "subject",
-      "fromName",
-      "fromEmail",
-    ]);
-
   const onFormSubmit = (values) => {
     const data = {
       name: values.name,
-      templateID: selectedTemplate.key,
+      template: getTemplateValuesFromForm(values),
       listID: selectedList.key,
     };
 
@@ -93,15 +82,7 @@ const CampaignForm = (props) => {
       message.error(error);
       console.log(error);
     };
-    const newTemplateValues = getTemplateValuesFromForm(values),
-      prevTemplateValues = getInitialTemplateValues();
-    if (!_.isEqual(newTemplateValues, prevTemplateValues))
-      dispatch(
-        editTemplate({
-          data: newTemplateValues,
-          templateID: selectedTemplate.key,
-        })
-      );
+
     dispatch(createCampaign({ data, onSuccess, onError }));
   };
 
@@ -165,11 +146,7 @@ const CampaignForm = (props) => {
         </AutoComplete>
       </Form.Item>
 
-      <Form.Item
-        name="selectedTemplate"
-        label="Select Template"
-        rules={[{ required: true, message: "Please Select a Template" }]}
-      >
+      <Form.Item name="selectedTemplate" label="Select Template">
         <AutoComplete
           onBlur={onFieldsBlur}
           onSelect={(value, option) => setSelectedTemplate(option)}
@@ -186,12 +163,14 @@ const CampaignForm = (props) => {
         </AutoComplete>
       </Form.Item>
 
-      {selectedTemplate && (
-        <TemplateFormFields
-          form={form}
-          initialFormValues={generateTemplateFormValues()}
-        />
-      )}
+      <TemplateFormFields
+        form={form}
+        {...(selectedTemplate
+          ? {
+              initialFormValues: generateTemplateFormValues(),
+            }
+          : {})}
+      />
 
       <Form.Item>
         <Button type="primary" htmlType="submit">

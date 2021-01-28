@@ -35,3 +35,7 @@ export const roles = [
   { label: "Admin", value: 1 },
   { label: "User", value: 2 },
 ];
+
+export const rolesMapping = { "Super Admin": 0, Admin: 1, User: 2 };
+
+export const rolesArray = ["Super Admin", "Admin", "User"];

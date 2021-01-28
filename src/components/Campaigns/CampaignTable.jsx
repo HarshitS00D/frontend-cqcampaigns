@@ -250,7 +250,6 @@ class CampaignsTable extends React.Component {
           scroll={{ x: true, y: 600 }}
           columns={columns}
           rowSelection={rowSelection}
-          tableLayout="auto"
           dataSource={tableData}
           pagination={{
             showSizeChanger: true,
