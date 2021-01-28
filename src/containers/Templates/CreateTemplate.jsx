@@ -6,7 +6,7 @@ const CreateTemplate = () => {
     <>
       <PageHeader
         className="site-page-header"
-        title="Create Templated"
+        title="Create Template"
         subTitle="Create or Edit your templates here"
       />
       <Divider />

@@ -4,8 +4,8 @@ import { Form, Row, Col, Input, Radio, Checkbox } from "antd";
 import Quill from "../quill";
 
 const initialValues = {
-  bodyType: 0,
-  analytics: [],
+  bodyType: 1,
+  analytics: [2],
   templateName: null,
   body: null,
   htmlBody: null,
@@ -19,6 +19,7 @@ const TemplateFormFields = (props) => {
     (props.initialFormValues && props.initialFormValues.bodyType) ||
       initialValues.bodyType
   );
+  const [removedAnalytics, setRemovedAnalytics] = useState([]);
   useEffect(() => {
     if (props.form) {
       props.form.setFieldsValue(props.initialFormValues || initialValues);
@@ -27,6 +28,22 @@ const TemplateFormFields = (props) => {
 
   const onBodyTypeChange = (e) => {
     setBodyType(e.target.value);
+    if (props.form) {
+      let analytics = props.form.getFieldValue("analytics");
+      switch (e.target.value) {
+        case 0:
+          if (analytics.includes(0)) removedAnalytics.push(0);
+          if (analytics.includes(1)) removedAnalytics.push(1);
+          setRemovedAnalytics(removedAnalytics);
+          analytics = analytics.filter((el) => el !== 0 && el !== 1);
+          break;
+        case 1:
+          analytics = [...analytics, ...removedAnalytics];
+          setRemovedAnalytics([]);
+          break;
+      }
+      props.form.setFieldsValue({ analytics });
+    }
   };
 
   const onEditorChange = (content, delta, source, editor) => {
