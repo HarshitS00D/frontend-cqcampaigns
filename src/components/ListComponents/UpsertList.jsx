@@ -27,8 +27,8 @@ const UpsertList = (props) => {
         props.hideModal();
       }
       setIsLoading(false);
-      message.success(data.success);
-      if (data.faultyRecords.length !== 0) {
+      message[data.warn ? "warn" : "success"](data.success || data.warn);
+      if (data.faultyRecords && data.faultyRecords.length !== 0) {
         message.error(`${data.faultyRecords.length} Faulty record(s)`);
       }
       form.resetFields();

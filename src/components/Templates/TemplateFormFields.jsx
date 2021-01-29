@@ -41,6 +41,8 @@ const TemplateFormFields = (props) => {
           analytics = [...analytics, ...removedAnalytics];
           setRemovedAnalytics([]);
           break;
+        default:
+          break;
       }
       props.form.setFieldsValue({ analytics });
     }
