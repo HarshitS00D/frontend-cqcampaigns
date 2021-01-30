@@ -149,23 +149,7 @@ class TemplateTable extends React.Component {
         render: (text, record) => (
           <span className="template-name">
             {record.name}
-            <Link
-              to={{
-                pathname: `/templates/${record._id}`,
-                state: {
-                  ..._.pick(record, [
-                    "analytics",
-                    "fromEmail",
-                    "fromName",
-                    "bodyType",
-                    "subject",
-                  ]),
-                  [record.bodyType === 1 ? "htmlBody" : "body"]: record.body,
-                  templateName: record.name,
-                },
-              }}
-              className="link"
-            >
+            <Link to={`/templates/${record._id}`} className="link">
               <Tooltip placement="left" title="Edit" color="blue">
                 <EditTwoTone
                   title="Edit template"

@@ -5,12 +5,21 @@ import { AutoComplete, Form, Input, Button, message } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import _ from "lodash";
 
-import { fetchTemplates } from "../../actions/templateActions";
-import { fetchUserLists } from "../../actions/listActions";
+import axios from "../../config/axios";
+import {
+  fetchCampaigns,
+  clearCampaigns,
+  editCampaign,
+} from "../../actions/campaignActions";
+import { fetchTemplates, clearTemplates } from "../../actions/templateActions";
+import { fetchUserLists, clearUserLists } from "../../actions/listActions";
 import { createCampaign } from "../../actions/campaignActions";
 import TemplateFormFields from "../Templates/TemplateFormFields";
 
 const CampaignForm = (props) => {
+  const campaign = useSelector((state) =>
+    state.campaigns.data ? state.campaigns.data[0] : null
+  );
   const templates = useSelector((state) => state.templates.data);
   const lists = useSelector((state) => state.userLists.data);
   const [templateOptions, setTemplateOptions] = useState(null);
@@ -21,11 +30,26 @@ const CampaignForm = (props) => {
 
   const [selectedTemplate, setSelectedTemplate] = useState();
   const [selectedList, setSelectedList] = useState();
+  const [initialFormValues, setInitialFormValues] = useState();
 
   useEffect(() => {
+    if (props.match.params.id) {
+      dispatch(fetchCampaigns({ filters: { _id: props.match.params.id } }));
+    } else {
+      dispatch(clearCampaigns());
+      form.resetFields();
+      setSelectedList();
+    }
+
     dispatch(fetchTemplates({ filters: { campaignID: { $eq: null } } }));
     dispatch(fetchUserLists());
-  }, [dispatch]);
+
+    return () => {
+      dispatch(clearCampaigns());
+      dispatch(clearTemplates());
+      dispatch(clearUserLists());
+    };
+  }, [dispatch, props.match.params.id, props.location.pathname, form]);
 
   useEffect(() => {
     if (Array.isArray(templates)) {
@@ -50,20 +74,32 @@ const CampaignForm = (props) => {
       }));
 
       setListOptions(options);
-    }
-  }, [lists]);
 
-  const getTemplateValuesFromForm = (values) => ({
-    ..._.pick(values, [
-      "analytics",
-      "bodyType",
-      "subject",
-      "fromName",
-      "fromEmail",
-    ]),
-    body: values.body || values.htmlBody,
-    name: values.templateName,
-  });
+      if (campaign) {
+        const option = options.filter(
+          (option) => option.key === campaign.listID
+        );
+
+        form.setFieldsValue({
+          name: campaign.name,
+          selectedList: option[0].label,
+        });
+        setSelectedList(option[0]);
+        fetchTemplateAttachedWithCampaign(campaign.templateID);
+      }
+    }
+  }, [lists, campaign, form]);
+
+  const fetchTemplateAttachedWithCampaign = async (templateID) => {
+    const { data } = await axios.get(`/api/template/`, {
+      params: { filters: { _id: templateID } },
+    });
+
+    if (data.data) {
+      const values = generateTemplateFormValues(data.data[0]);
+      setInitialFormValues(values);
+    }
+  };
 
   const onFormSubmit = (values) => {
     const data = {
@@ -75,7 +111,7 @@ const CampaignForm = (props) => {
     const onSuccess = (data) => {
       message.success(data);
       form.resetFields();
-      props.history.push("/campaigns");
+      props.history.goBack();
     };
 
     const onError = (error) => {
@@ -83,7 +119,20 @@ const CampaignForm = (props) => {
       console.log(error);
     };
 
-    dispatch(createCampaign({ data, onSuccess, onError }));
+    if (campaign) {
+      const prevData = {
+        name: campaign.name,
+        template: getTemplateValuesFromForm(initialFormValues),
+        listID: campaign.listID,
+      };
+
+      if (_.isEqual(prevData, data)) return message.warn("No Changes made");
+
+      data.template._id = campaign.templateID;
+      dispatch(
+        editCampaign({ campaignID: campaign._id, data, onSuccess, onError })
+      );
+    } else dispatch(createCampaign({ data, onSuccess, onError }));
   };
 
   const onFieldsBlur = () => {
@@ -94,9 +143,7 @@ const CampaignForm = (props) => {
     if (resetFields.length) form.resetFields(resetFields);
   };
 
-  const generateTemplateFormValues = () => {
-    const record = templates[selectedTemplate.index];
-
+  const generateTemplateFormValues = (record) => {
     return {
       ..._.pick(record, [
         "analytics",
@@ -109,6 +156,18 @@ const CampaignForm = (props) => {
       templateName: record.name,
     };
   };
+
+  const getTemplateValuesFromForm = (values) => ({
+    ..._.pick(values, [
+      "analytics",
+      "bodyType",
+      "subject",
+      "fromName",
+      "fromEmail",
+    ]),
+    body: values.body || values.htmlBody,
+    name: values.templateName,
+  });
 
   return (
     <Form form={form} onFinish={onFormSubmit} layout="vertical">
@@ -167,14 +226,16 @@ const CampaignForm = (props) => {
         form={form}
         {...(selectedTemplate
           ? {
-              initialFormValues: generateTemplateFormValues(),
+              initialFormValues: generateTemplateFormValues(
+                templates[selectedTemplate.index]
+              ),
             }
-          : {})}
+          : { initialFormValues })}
       />
 
       <Form.Item>
         <Button type="primary" htmlType="submit">
-          Submit
+          {campaign ? "Update" : "Submit"}
         </Button>
       </Form.Item>
     </Form>

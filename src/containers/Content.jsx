@@ -35,9 +35,20 @@ const Content = () => {
         <Route exact path="/templates/create" component={CreateTemplate} />
         <Route exact path="/templates/" component={ManageTemplates} />
         <Route exact path="/templates/:id" component={CreateTemplate} />
-        <Route exact path="/campaigns/create" component={CreateCampaign} />
+        <Route
+          exact
+          path="/campaigns/create"
+          component={CreateCampaign}
+          key={window.location.pathname}
+        />
         <Route exact path="/campaigns/" component={ManageCampaign} />
         <Route exact path="/campaigns/:id" component={CampaignDetail} />
+        <Route
+          exact
+          path="/campaigns/:id/edit"
+          component={CreateCampaign}
+          key={window.location.pathname}
+        />
         <Route
           exact
           path="/users/create"

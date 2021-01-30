@@ -205,9 +205,7 @@ class CampaignsTable extends React.Component {
         fixed: "right",
         align: "center",
         render: (val, record) => (
-          <Link to={{ state: record, pathname: `/campaigns/${record._id}` }}>
-            Manage
-          </Link>
+          <Link to={`/campaigns/${record._id}`}>Manage</Link>
         ),
       });
     }

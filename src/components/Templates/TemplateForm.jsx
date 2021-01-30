@@ -19,18 +19,16 @@ const initialValues = {
 };
 
 const TemplateForm = (props) => {
-  const templateID = props.match.params.id;
+  const templateID = /* props.templateID ||*/ props.match.params.id;
   const [form] = Form.useForm();
   const [initialFormValues, setinitialFormValues] = useState(
-    props.initialFormValues || props.location.state || initialValues
+    props.initialFormValues || initialValues
   );
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (props.location.pathname.split("/").includes("create")) {
-      form.setFieldsValue(initialValues);
-    }
-  }, [form, props.location.pathname]);
+    if (!templateID) form.setFieldsValue(initialValues);
+  }, [form, templateID]);
 
   const onSubmit = (data) => {
     if (_.isEqual(initialFormValues, data)) {

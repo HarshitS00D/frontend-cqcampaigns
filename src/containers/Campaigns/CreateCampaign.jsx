@@ -3,17 +3,18 @@ import { PageHeader, Divider } from "antd";
 
 import CampaignForm from "../../components/Campaigns/CampaignForm";
 
-const CreateCampaign = () => {
+const CreateCampaign = (props) => {
   return (
-    <div>
+    <>
       <PageHeader
         className="site-page-header"
-        title="Create Campaigns"
-        subTitle="create your campaigns here"
+        title={`${props.match.params.id ? "Update" : "Create"} Campaign`}
+        subTitle="create or edit your campaigns here"
+        onBack={() => props.history.goBack()}
       />
       <Divider />
       <CampaignForm />
-    </div>
+    </>
   );
 };
 

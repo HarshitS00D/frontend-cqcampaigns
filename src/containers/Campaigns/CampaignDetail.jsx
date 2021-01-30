@@ -12,10 +12,12 @@ import {
   Modal,
   Input,
   Spin,
+  Tooltip,
 } from "antd";
-import { MailTwoTone } from "@ant-design/icons";
-import _ from "lodash";
+import { MailTwoTone, EditTwoTone } from "@ant-design/icons";
+//import _ from "lodash";
 
+import { fetchCampaigns, clearCampaigns } from "../../actions/campaignActions";
 import { fetchTemplates, clearTemplates } from "../../actions/templateActions";
 import { fetchUserLists, clearUserLists } from "../../actions/listActions";
 import { sendEmails } from "../../actions/campaignActions";
@@ -24,20 +26,18 @@ import { regularExpressions } from "../../utils/static_vars";
 import "./campaign.css";
 
 const CampaignDetail = (props) => {
+  const campaign = useSelector((state) =>
+    state.campaigns.data ? state.campaigns.data[0] : null
+  );
   const template = useSelector((state) =>
     state.templates.data ? state.templates.data[0] : null
   );
   const list = useSelector((state) =>
     state.userLists.data ? state.userLists.data[0] : null
   );
-
   const dispatch = useDispatch();
-  const {
-    templateID,
-    listID,
-    _id: campaignID,
-    name: campaignName,
-  } = props.location.state;
+
+  const [isCampaignLoading, setIsCampaignLoading] = useState(false);
   const [isTemplateLoading, setIsTemplateLoading] = useState(false);
   const [isListLoading, setIsListLoading] = useState(false);
   const [isSendEmailsLoading, setIsSendEmailsLoading] = useState(false);
@@ -53,27 +53,44 @@ const CampaignDetail = (props) => {
     setIsListLoading(false);
   };
 
+  const fetchCampaignsCallback = () => {
+    setIsCampaignLoading(false);
+  };
+
   useEffect(() => {
+    setIsCampaignLoading(true);
+    dispatch(
+      fetchCampaigns({
+        filters: { _id: props.match.params.id },
+        callback: fetchCampaignsCallback,
+      })
+    );
+
+    return () => {
+      dispatch(clearCampaigns());
+      dispatch(clearTemplates());
+      dispatch(clearUserLists());
+    };
+  }, [dispatch, props.match.params.id]);
+
+  useEffect(() => {
+    if (!campaign) return;
+
     setIsListLoading(true);
     setIsTemplateLoading(true);
     dispatch(
       fetchTemplates({
-        filters: { _id: templateID },
+        filters: { _id: campaign.templateID },
         callback: fetchTemplatesCallback,
       })
     );
     dispatch(
       fetchUserLists({
-        filters: { _id: listID },
+        filters: { _id: campaign.listID },
         callback: fetchUserListsCallback,
       })
     );
-
-    return () => {
-      dispatch(clearTemplates());
-      dispatch(clearUserLists());
-    };
-  }, [templateID, dispatch, listID]);
+  }, [campaign, dispatch]);
 
   const onSuccess = (data) => {
     setIsSendEmailsLoading(false);
@@ -92,7 +109,11 @@ const CampaignDetail = (props) => {
     setIsSendEmailsLoading(true);
     dispatch(
       sendEmails({
-        body: { listID, campaignID, templateID },
+        body: {
+          listID: campaign.listID,
+          campaignID: campaign._id,
+          templateID: campaign.templateID,
+        },
         onSuccess,
         onError,
       })
@@ -105,7 +126,11 @@ const CampaignDetail = (props) => {
     setIsSendTestEmailLoading(true);
 
     dispatch(
-      sendEmails({ body: { to: testEmail, templateID }, onSuccess, onError })
+      sendEmails({
+        body: { to: testEmail, templateID: campaign.templateID },
+        onSuccess,
+        onError,
+      })
     );
   };
 
@@ -145,25 +170,7 @@ const CampaignDetail = (props) => {
     return (
       <>
         <Tag color="#108ee9">Template Attached :</Tag>
-        <Link
-          to={{
-            pathname: `/templates/${record._id}`,
-            state: {
-              ..._.pick(record, [
-                "analytics",
-                "fromEmail",
-                "fromName",
-                "bodyType",
-                "subject",
-              ]),
-              [record.bodyType === 1 ? "htmlBody" : "body"]: record.body,
-              templateName: record.name,
-            },
-          }}
-          // className="link"
-        >
-          {template.name}
-        </Link>
+        <Link to={`/templates/${record._id}`}>{template.name}</Link>
         <Divider type="vertical" />
       </>
     );
@@ -207,12 +214,19 @@ const CampaignDetail = (props) => {
         onBack={() => props.history.goBack()}
       />
       <Divider />
-      <Spin spinning={isTemplateLoading || isListLoading}>
+      <Spin spinning={isCampaignLoading || isTemplateLoading || isListLoading}>
         {template && (
           <div
             style={{ background: "white", padding: "20px", fontSize: "1rem" }}
           >
-            <h2>{campaignName}</h2>
+            <h2>
+              {campaign && campaign.name}{" "}
+              <Link to={`/campaigns/${props.match.params.id}/edit`}>
+                <Tooltip placement="right" title="Edit" color="blue">
+                  <EditTwoTone style={{ fontSize: "large" }} />
+                </Tooltip>
+              </Link>
+            </h2>
 
             <div>
               {list && renderListTitle()}

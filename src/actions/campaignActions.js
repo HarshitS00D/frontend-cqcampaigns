@@ -14,6 +14,17 @@ export const createCampaign = (args = {}) => async () => {
   }
 };
 
+export const editCampaign = (args = {}) => async () => {
+  const { campaignID, data, onSuccess, onError } = args;
+  try {
+    const response = await axios.patch(`/api/campaign/${campaignID}`, data);
+    if (onSuccess) onSuccess(response.data);
+  } catch (error) {
+    console.log({ error });
+    if (onError) onError(error.response.data);
+  }
+};
+
 export const deleteCampaigns = (args = {}) => async (dispatch) => {
   const { campaignIDs, pagination, filters, onSuccess, onError } = args;
   try {

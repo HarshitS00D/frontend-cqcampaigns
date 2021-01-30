@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { withRouter } from "react-router-dom";
 import { Form, Row, Col, Input, Radio, Checkbox } from "antd";
+import _ from "lodash";
 
 import Quill from "../quill";
+import { fetchTemplates, clearTemplates } from "../../actions/templateActions";
 
 const initialValues = {
   bodyType: 0,
@@ -15,21 +19,53 @@ const initialValues = {
 };
 
 const TemplateFormFields = (props) => {
+  const templateID = props.templateID || props.match.params.id;
+  const { form } = props;
+  const dispatch = useDispatch();
   const [bodyType, setBodyType] = useState(
     (props.initialFormValues && props.initialFormValues.bodyType) ||
       initialValues.bodyType
   );
+  const templateValues = useSelector(
+    (state) =>
+      templateID &&
+      state.templates.data &&
+      state.templates.data.filter((el) => el._id === templateID)[0]
+  );
   const [removedAnalytics, setRemovedAnalytics] = useState([]);
   useEffect(() => {
-    if (props.form) {
-      props.form.setFieldsValue(props.initialFormValues || initialValues);
+    //console.log(templateID);
+    if (templateID) {
+      dispatch(fetchTemplates({ filters: { _id: templateID } }));
+    } //else form.setFieldsValue(initialValues);
+  }, [templateID, dispatch, form]);
+
+  useEffect(() => {
+    const templateFormValues = generateTemplateFormValues(templateValues);
+    //console.log(templateFormValues);
+    if (templateFormValues) {
+      if (props.setInitialFormValues) {
+        props.setInitialFormValues(templateFormValues);
+      }
+      setBodyType(templateFormValues.bodyType);
+      form.setFieldsValue(templateFormValues);
     }
-  }, [props.initialFormValues, props.form]);
+  }, [templateValues, form]);
+
+  useEffect(() => () => dispatch(clearTemplates()), [dispatch]);
+
+  useEffect(() => {
+    if (form) {
+      form.setFieldsValue(props.initialFormValues || initialValues);
+      if (props.initialFormValues)
+        setBodyType(props.initialFormValues.bodyType);
+    }
+  }, [props.initialFormValues, form]);
 
   const onBodyTypeChange = (e) => {
     setBodyType(e.target.value);
-    if (props.form) {
-      let analytics = props.form.getFieldValue("analytics");
+    if (form) {
+      let analytics = form.getFieldValue("analytics");
       switch (e.target.value) {
         case 0:
           if (analytics.includes(0)) removedAnalytics.push(0);
@@ -44,7 +80,7 @@ const TemplateFormFields = (props) => {
         default:
           break;
       }
-      props.form.setFieldsValue({ analytics });
+      form.setFieldsValue({ analytics });
     }
   };
 
@@ -52,7 +88,7 @@ const TemplateFormFields = (props) => {
     const htmltext = editor.getHTML(),
       text = editor.getText();
     if (text.length) {
-      props.form.setFieldsValue({ htmlBody: htmltext });
+      form.setFieldsValue({ htmlBody: htmltext });
     }
   };
   return (
@@ -186,4 +222,20 @@ const TemplateFormFields = (props) => {
   );
 };
 
-export default TemplateFormFields;
+function generateTemplateFormValues(record) {
+  return record
+    ? {
+        ..._.pick(record, [
+          "analytics",
+          "fromEmail",
+          "fromName",
+          "bodyType",
+          "subject",
+        ]),
+        [record.bodyType === 1 ? "htmlBody" : "body"]: record.body,
+        templateName: record.name,
+      }
+    : undefined;
+}
+
+export default withRouter(TemplateFormFields);
