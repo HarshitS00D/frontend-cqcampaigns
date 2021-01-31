@@ -240,10 +240,14 @@ const CampaignDetail = (props) => {
             </p>
 
             <Card title={renderCardTitle()}>
-              <div
-                contentEditable="false"
-                dangerouslySetInnerHTML={{ __html: template.body }}
-              />
+              {template.bodyType === 1 ? (
+                <div
+                  contentEditable="false"
+                  dangerouslySetInnerHTML={{ __html: template.body }}
+                />
+              ) : (
+                template.body
+              )}
             </Card>
 
             <div className="card-footer">
