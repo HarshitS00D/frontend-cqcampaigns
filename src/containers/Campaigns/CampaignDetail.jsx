@@ -106,6 +106,7 @@ const CampaignDetail = (props) => {
   };
 
   const onSendEmails = () => {
+    if (!list) return message.error("No List Attached");
     setIsSendEmailsLoading(true);
     dispatch(
       sendEmails({

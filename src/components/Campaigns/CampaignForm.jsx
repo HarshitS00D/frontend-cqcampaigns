@@ -80,11 +80,15 @@ const CampaignForm = (props) => {
           (option) => option.key === campaign.listID
         );
 
-        form.setFieldsValue({
+        const values = {
           name: campaign.name,
-          selectedList: option[0].label,
-        });
-        setSelectedList(option[0]);
+        };
+        if (option.length) {
+          values.selectedList = option[0].label;
+          setSelectedList(option[0]);
+        }
+
+        form.setFieldsValue(values);
         fetchTemplateAttachedWithCampaign(campaign.templateID);
       }
     }
