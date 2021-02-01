@@ -21,7 +21,7 @@ const initialValues = {
 const TemplateForm = (props) => {
   const templateID = /* props.templateID ||*/ props.match.params.id;
   const [form] = Form.useForm();
-  const [initialFormValues, setinitialFormValues] = useState(
+  const [initialFormValues, setInitialFormValues] = useState(
     props.initialFormValues || initialValues
   );
   const dispatch = useDispatch();
@@ -31,9 +31,10 @@ const TemplateForm = (props) => {
   }, [form, templateID]);
 
   const onSubmit = (data) => {
+    // console.log({ initialFormValues, data });
     if (_.isEqual(initialFormValues, data)) {
       message.warning("No changes made", 1);
-      return props.history.push("/templates/");
+      return props.history.goBack();
     }
 
     const body = data.htmlBody;
@@ -46,7 +47,7 @@ const TemplateForm = (props) => {
     const onSuccess = (res) => {
       message.success(res, 1);
       form.resetFields();
-      setinitialFormValues({
+      setInitialFormValues({
         bodyType: 0,
         analytics: [],
       });
@@ -72,7 +73,8 @@ const TemplateForm = (props) => {
     >
       <TemplateFormFields
         form={form}
-        initialFormValues={props.location.state}
+        templateID={templateID}
+        setInitialTemplateValues={setInitialFormValues}
       />
       <Button type="primary" htmlType="Submit" style={{ marginTop: "2rem" }}>
         {props.match.params.id ? `Update ` : `Create `} Template
