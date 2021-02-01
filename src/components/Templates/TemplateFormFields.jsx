@@ -22,10 +22,7 @@ const TemplateFormFields = (props) => {
   const templateID = props.templateID || props.match.params.id;
   const { form } = props;
   const dispatch = useDispatch();
-  const [bodyType, setBodyType] = useState(
-    (props.initialFormValues && props.initialFormValues.bodyType) ||
-      initialValues.bodyType
-  );
+  const [bodyType, setBodyType] = useState(initialValues.bodyType);
   const templateValues = useSelector(
     (state) =>
       templateID &&
@@ -34,38 +31,31 @@ const TemplateFormFields = (props) => {
   );
   const [removedAnalytics, setRemovedAnalytics] = useState([]);
   useEffect(() => {
-    //console.log(templateID);
-    if (templateID) {
-      dispatch(fetchTemplates({ filters: { _id: templateID } }));
+    if (templateID && !templateValues) {
+      dispatch(fetchTemplates());
     } //else form.setFieldsValue(initialValues);
-  }, [templateID, dispatch, form]);
+  }, [templateID, dispatch, form, templateValues]);
 
   useEffect(() => {
-    const templateFormValues = generateTemplateFormValues(templateValues);
+    const templateFormValues = generateTemplateFormValues(
+      templateValues || initialValues
+    );
+    if (props.setInitialTemplateValues)
+      props.setInitialTemplateValues(templateFormValues);
     //console.log(templateFormValues);
-    if (templateFormValues) {
-      if (props.setInitialFormValues) {
-        props.setInitialFormValues(templateFormValues);
-      }
-      setBodyType(templateFormValues.bodyType);
-      form.setFieldsValue(templateFormValues);
+    if (props.setInitialFormValues) {
+      props.setInitialFormValues(templateFormValues);
     }
+    setBodyType(templateFormValues.bodyType);
+    form.setFieldsValue(templateFormValues);
   }, [templateValues, form]);
 
   useEffect(() => () => dispatch(clearTemplates()), [dispatch]);
 
-  useEffect(() => {
-    if (form) {
-      form.setFieldsValue(props.initialFormValues || initialValues);
-      if (props.initialFormValues)
-        setBodyType(props.initialFormValues.bodyType);
-    }
-  }, [props.initialFormValues, form]);
-
   const onBodyTypeChange = (e) => {
     setBodyType(e.target.value);
     if (form) {
-      let analytics = form.getFieldValue("analytics");
+      let analytics = form.getFieldValue("analytics") || [];
       switch (e.target.value) {
         case 0:
           if (analytics.includes(0)) removedAnalytics.push(0);

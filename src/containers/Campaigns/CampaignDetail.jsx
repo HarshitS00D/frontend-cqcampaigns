@@ -26,6 +26,7 @@ import { regularExpressions } from "../../utils/static_vars";
 import "./campaign.css";
 
 const CampaignDetail = (props) => {
+  const campaignID = props.match.params.id;
   const campaign = useSelector((state) =>
     state.campaigns.data ? state.campaigns.data[0] : null
   );
@@ -61,7 +62,7 @@ const CampaignDetail = (props) => {
     setIsCampaignLoading(true);
     dispatch(
       fetchCampaigns({
-        filters: { _id: props.match.params.id },
+        filters: { _id: campaignID },
         callback: fetchCampaignsCallback,
       })
     );
@@ -71,7 +72,7 @@ const CampaignDetail = (props) => {
       dispatch(clearTemplates());
       dispatch(clearUserLists());
     };
-  }, [dispatch, props.match.params.id]);
+  }, [dispatch, campaignID]);
 
   useEffect(() => {
     if (!campaign) return;
@@ -216,60 +217,69 @@ const CampaignDetail = (props) => {
       />
       <Divider />
       <Spin spinning={isCampaignLoading || isTemplateLoading || isListLoading}>
-        {template && (
-          <div
-            style={{ background: "white", padding: "20px", fontSize: "1rem" }}
-          >
-            <h2>
-              {campaign && campaign.name}{" "}
-              <Link to={`/campaigns/${props.match.params.id}/edit`}>
-                <Tooltip placement="right" title="Edit" color="blue">
-                  <EditTwoTone style={{ fontSize: "large" }} />
-                </Tooltip>
-              </Link>
-            </h2>
+        {isCampaignLoading || isTemplateLoading || isListLoading
+          ? null
+          : template && (
+              <div
+                style={{
+                  background: "white",
+                  padding: "20px",
+                  fontSize: "1rem",
+                }}
+              >
+                <h2>
+                  {campaign && campaign.name}{" "}
+                  <Link to={`/campaigns/${campaignID}/edit`}>
+                    <Tooltip placement="right" title="Edit" color="blue">
+                      <EditTwoTone style={{ fontSize: "large" }} />
+                    </Tooltip>
+                  </Link>
+                </h2>
 
-            <div>
-              {list && renderListTitle()}
-              {template && renderTemplateTitle()}
-            </div>
+                <div>
+                  {list && renderListTitle()}
+                  {template && renderTemplateTitle()}
+                </div>
 
-            <p>
-              <Tag color="#87d068">From :</Tag>
-              {template.fromName}
-              <Typography.Link> {`<${template.fromEmail}>`} </Typography.Link>
-            </p>
+                <p>
+                  <Tag color="#87d068">From :</Tag>
+                  {template.fromName}
+                  <Typography.Link>
+                    {" "}
+                    {`<${template.fromEmail}>`}{" "}
+                  </Typography.Link>
+                </p>
 
-            <Card title={renderCardTitle()}>
-              {template.bodyType === 1 ? (
-                <div
-                  contentEditable="false"
-                  dangerouslySetInnerHTML={{ __html: template.body }}
-                />
-              ) : (
-                template.body
-              )}
-            </Card>
+                <Card title={renderCardTitle()}>
+                  {template.bodyType === 1 ? (
+                    <div
+                      contentEditable="false"
+                      dangerouslySetInnerHTML={{ __html: template.body }}
+                    />
+                  ) : (
+                    template.body
+                  )}
+                </Card>
 
-            <div className="card-footer">
-              <div>
-                <Button
-                  type="primary"
-                  onClick={onSendEmails}
-                  loading={isSendEmailsLoading}
-                >
-                  Send Emails
-                </Button>
+                <div className="card-footer">
+                  <div>
+                    <Button
+                      type="primary"
+                      onClick={onSendEmails}
+                      loading={isSendEmailsLoading}
+                    >
+                      Send Emails
+                    </Button>
 
-                {TestMailModal}
-                <Button type="secondary" onClick={showModal}>
-                  Send Test Email
-                </Button>
+                    {TestMailModal}
+                    <Button type="secondary" onClick={showModal}>
+                      Send Test Email
+                    </Button>
+                  </div>
+                  <div>{/* for future add on buttons */}</div>
+                </div>
               </div>
-              <div>{/* for future add on buttons */}</div>
-            </div>
-          </div>
-        )}
+            )}
       </Spin>
     </>
   );
