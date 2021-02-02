@@ -34,7 +34,8 @@ const TemplateForm = (props) => {
     // console.log({ initialFormValues, data });
     if (_.isEqual(initialFormValues, data)) {
       message.warning("No changes made", 1);
-      return props.history.goBack();
+      if (templateID) return props.history.goBack();
+      else return props.history.push("/templates");
     }
 
     const body = data.htmlBody;
@@ -51,7 +52,8 @@ const TemplateForm = (props) => {
         bodyType: 0,
         analytics: [],
       });
-      return props.history.goBack();
+      if (templateID) return props.history.goBack();
+      else return props.history.push("/templates");
     };
     const onError = (err) => message.error("Some Error Occured", 1);
     dispatch(

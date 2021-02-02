@@ -23,10 +23,8 @@ const CampaignForm = (props) => {
       state.campaigns.data &&
       state.campaigns.data.filter((el) => el._id === campaignID)[0]
   );
-  const templates = useSelector(
-    (state) =>
-      state.templates.data &&
-      state.templates.data.filter((el) => !el.campaignID)
+  const templates = useSelector((state) =>
+    state.templates.data ? state.templates.data : null
   );
   const lists = useSelector((state) => state.userLists.data);
   const [templateOptions, setTemplateOptions] = useState([]);
@@ -60,16 +58,32 @@ const CampaignForm = (props) => {
 
   useEffect(() => {
     if (Array.isArray(templates)) {
-      const options = templates.map((template, index) => ({
-        key: template._id,
-        label: template.name,
-        value: template.name,
-        index,
-      }));
+      const options = templates.reduce((filtered, template, index) => {
+        if (!template.campaignID) {
+          let newOption = {
+            key: template._id,
+            label: template.name,
+            value: template.name,
+            index,
+          };
+          filtered.push(newOption);
+        }
+        return filtered;
+      }, []);
 
       setTemplateOptions(options);
+
+      if (campaign) {
+        const values = generateTemplateFormValues(
+          templates.filter(
+            (template) => template._id === campaign.templateID
+          )[0]
+        );
+
+        setInitialTemplateValues(values);
+      }
     }
-  }, [templates && templates.length]);
+  }, [templates && templates.length, campaign]);
 
   useEffect(() => {
     if (Array.isArray(lists)) {
@@ -109,7 +123,8 @@ const CampaignForm = (props) => {
     const onSuccess = (data) => {
       message.success(data);
       form.resetFields();
-      props.history.goBack();
+      if (campaignID) return props.history.goBack();
+      else return props.history.push("/campaigns");
     };
 
     const onError = (error) => {
@@ -123,8 +138,11 @@ const CampaignForm = (props) => {
         template: getTemplateValuesFromForm(initialTemplateValues),
         listID: campaign.listID,
       };
-      //console.log({ prevData, data });
-      if (_.isEqual(prevData, data)) return message.warn("No Changes made");
+      if (_.isEqual(prevData, data)) {
+        message.warn("No Changes made");
+        if (campaignID) return props.history.goBack();
+        else return props.history.push("/campaigns");
+      }
 
       data.template._id = campaign.templateID;
       dispatch(
@@ -140,6 +158,22 @@ const CampaignForm = (props) => {
 
     if (resetFields.length) form.resetFields(resetFields);
   };
+
+  function generateTemplateFormValues(record) {
+    return record
+      ? {
+          ..._.pick(record, [
+            "analytics",
+            "fromEmail",
+            "fromName",
+            "bodyType",
+            "subject",
+          ]),
+          [record.bodyType === 1 ? "htmlBody" : "body"]: record.body,
+          templateName: record.name,
+        }
+      : undefined;
+  }
 
   const getTemplateValuesFromForm = (values) => ({
     ..._.pick(values, [
@@ -208,7 +242,6 @@ const CampaignForm = (props) => {
 
       <TemplateFormFields
         form={form}
-        setInitialTemplateValues={setInitialTemplateValues}
         templateID={
           (selectedTemplate && selectedTemplate.key) ||
           (campaign && campaign.templateID)

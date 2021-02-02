@@ -229,26 +229,31 @@ const CampaignDetail = (props) => {
               >
                 <h2>
                   {campaign && campaign.name}{" "}
-                  <Link to={`/campaigns/${campaignID}/edit`}>
+                  <Link
+                    to={`/campaigns/${campaignID}/edit`}
+                    style={{
+                      position: "absolute",
+                      top: "20px",
+                      right: "30px",
+                    }}
+                  >
                     <Tooltip placement="right" title="Edit" color="blue">
                       <EditTwoTone style={{ fontSize: "large" }} />
                     </Tooltip>
                   </Link>
                 </h2>
 
-                <div>
-                  {list && renderListTitle()}
-                  {template && renderTemplateTitle()}
-                </div>
-
-                <p>
+                <div style={{ paddingBottom: "10px" }}>
                   <Tag color="#87d068">From :</Tag>
                   {template.fromName}
                   <Typography.Link>
                     {" "}
                     {`<${template.fromEmail}>`}{" "}
                   </Typography.Link>
-                </p>
+                  <Divider type="vertical" />
+                  {list && renderListTitle()}
+                  {template && renderTemplateTitle()}
+                </div>
 
                 <Card title={renderCardTitle()}>
                   {template.bodyType === 1 ? (
