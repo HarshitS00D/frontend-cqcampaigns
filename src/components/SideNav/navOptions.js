@@ -7,92 +7,96 @@ import {
   SettingOutlined,
 } from "@ant-design/icons";
 
-export const navOptions = [
-  {
-    link: "/",
-    title: "Dashboard",
-    icon: <DashboardOutlined />,
-    key: 1,
-  },
-  {
-    title: "Lists",
-    icon: <UnorderedListOutlined />,
-    key: "sub1",
-    link: "/lists",
-    subOptions: [
-      {
-        link: "/lists/create",
-        title: "Create List",
-        key: 2,
-      },
-      {
-        link: "/lists",
-        title: "Manage Lists",
-        key: 3,
-      },
-    ],
-  },
-  {
-    title: "Templates",
-    icon: <FormOutlined />,
-    key: "sub2",
-    link: "/templates",
-    subOptions: [
-      {
-        link: "/templates/create",
-        title: "Create Template",
-        key: 4,
-      },
-      {
-        link: "/templates",
-        title: "Manage Templates",
-        key: 5,
-      },
-    ],
-  },
-  {
-    title: "Campaigns",
-    icon: <MailOutlined />,
-    key: "sub3",
-    link: "/campaigns",
-    subOptions: [
-      {
-        link: "/campaigns/create",
-        title: "Create Campaign",
-        key: 6,
-      },
-      {
-        link: "/campaigns",
-        title: "Manage Campaigns",
-        key: 7,
-      },
-    ],
-  },
-  {
-    title: "Accounts",
-    icon: <TeamOutlined />,
-    key: "sub4",
-    link: "/users",
-    subOptions: [
-      {
-        link: "/users/create",
-        title: "Create new account ",
-        key: 8,
-      },
-      {
-        link: "/users/",
-        title: "Delete account",
-        key: 9,
-      },
-    ],
-  },
-  {
-    link: "/settings",
-    title: "Settings",
-    icon: <SettingOutlined />,
-    key: 10,
-  },
-];
+export const getNavOptions = (role) => {
+  const options = [
+    {
+      link: "/",
+      title: "Dashboard",
+      icon: <DashboardOutlined />,
+      key: 1,
+    },
+    {
+      title: "Lists",
+      icon: <UnorderedListOutlined />,
+      key: "sub1",
+      link: "/lists",
+      subOptions: [
+        {
+          link: "/lists/create",
+          title: "Create List",
+          key: 2,
+        },
+        {
+          link: "/lists",
+          title: "Manage Lists",
+          key: 3,
+        },
+      ],
+    },
+    {
+      title: "Templates",
+      icon: <FormOutlined />,
+      key: "sub2",
+      link: "/templates",
+      subOptions: [
+        {
+          link: "/templates/create",
+          title: "Create Template",
+          key: 4,
+        },
+        {
+          link: "/templates",
+          title: "Manage Templates",
+          key: 5,
+        },
+      ],
+    },
+    {
+      title: "Campaigns",
+      icon: <MailOutlined />,
+      key: "sub3",
+      link: "/campaigns",
+      subOptions: [
+        {
+          link: "/campaigns/create",
+          title: "Create Campaign",
+          key: 6,
+        },
+        {
+          link: "/campaigns",
+          title: "Manage Campaigns",
+          key: 7,
+        },
+      ],
+    },
+    {
+      title: "Accounts",
+      icon: <TeamOutlined />,
+      key: "sub4",
+      link: "/users",
+      subOptions: [
+        {
+          link: "/users/create",
+          title: "Create new account ",
+          key: 8,
+        },
+        {
+          link: "/users",
+          title: role < 1 ? "Users List" : "Delete account",
+          key: 9,
+        },
+      ],
+    },
+    {
+      link: "/settings",
+      title: "Settings",
+      icon: <SettingOutlined />,
+      key: 10,
+    },
+  ];
+
+  return options.filter((el) => (role > 1 ? el.link !== `/users` : true));
+};
 
 export const rootSubmenuKeys = ["sub1", "sub2", "sub3", "sub4"];
 

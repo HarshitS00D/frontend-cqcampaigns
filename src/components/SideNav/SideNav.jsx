@@ -4,7 +4,11 @@ import { Layout, Menu } from "antd";
 import _ from "lodash";
 import { Link, withRouter } from "react-router-dom";
 
-import { navOptions, rootSubmenuKeys, getInitiallyOpenKey } from "./navOptions";
+import {
+  getNavOptions,
+  rootSubmenuKeys,
+  getInitiallyOpenKey,
+} from "./navOptions";
 
 const { Sider } = Layout;
 
@@ -41,11 +45,9 @@ const SideNav = ({ location: { pathname } }) => {
         openKeys={openKeys}
         onOpenChange={onOpenChange}
       >
-        {navOptions
-          .filter((el) => (user.role > 1 ? el.link !== `/users` : true))
-          .map((item) =>
-            item.subOptions ? renderWithSubOptions(item) : renderOption(item)
-          )}
+        {getNavOptions(user.role).map((item) =>
+          item.subOptions ? renderWithSubOptions(item) : renderOption(item)
+        )}
       </Menu>
     </Sider>
   );
