@@ -64,6 +64,7 @@ const Content = () => {
           }
         />
         <Route exact path="/settings" component={Settings} />
+        <Route path="" component={() => <h1>{`404: Not Found`}</h1>} />
       </Switch>
     </Layout.Content>
   );

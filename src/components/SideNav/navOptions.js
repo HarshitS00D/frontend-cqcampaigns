@@ -114,18 +114,20 @@ export const getInitiallyOpenKey = (pathname) => {
   const paths = pathname.split("/").filter((el) => el.length > 0);
   const keys = {};
 
-  keys.initialSubKey = subMenuKeyMapping[paths[0]].link;
+  keys.initialSubKey =
+    (subMenuKeyMapping[paths[0]] && subMenuKeyMapping[paths[0]].link) || 1;
 
   switch (paths[0]) {
     case "dashboard":
     case "settings":
-      keys.initialKey = subMenuKeyMapping[paths[0]].link;
+      keys.initialKey = keys.initialSubKey;
       break;
     default:
-      keys.initialKey =
-        paths[1] !== "create"
+      keys.initialKey = Object.keys(subMenuKeyMapping).includes(paths[0])
+        ? paths[1] !== "create"
           ? subMenuKeyMapping[paths[0]].manage
-          : subMenuKeyMapping[paths[0]].create;
+          : subMenuKeyMapping[paths[0]].create
+        : keys.initialSubKey;
   }
 
   return keys;
