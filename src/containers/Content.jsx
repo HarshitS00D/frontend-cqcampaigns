@@ -16,6 +16,8 @@ import ManageUsers from "./Accounts/ManageUsers";
 import Settings from "./Settings";
 import Dashboard from "./Dashboard/Dashboard";
 
+import { rolesMapping } from "../utils/static_vars";
+
 const Content = () => {
   const user = useSelector((state) => state.session.user);
   return (
@@ -53,14 +55,18 @@ const Content = () => {
           exact
           path="/users/create"
           component={
-            user.role < 2 ? CreateUser : () => <h1>{`401: Not Authorized`}</h1>
+            user.role < rolesMapping.User
+              ? CreateUser
+              : () => <h1>{`401: Not Authorized`}</h1>
           }
         />
         <Route
           exact
           path="/users/"
           component={
-            user.role < 2 ? ManageUsers : () => <h1>{`401: Not Authorized`}</h1>
+            user.role < rolesMapping.User
+              ? ManageUsers
+              : () => <h1>{`401: Not Authorized`}</h1>
           }
         />
         <Route exact path="/settings" component={Settings} />

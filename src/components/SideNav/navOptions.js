@@ -6,6 +6,7 @@ import {
   TeamOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
+import { rolesMapping } from "../../utils/static_vars";
 
 export const getNavOptions = (role) => {
   const options = [
@@ -82,7 +83,7 @@ export const getNavOptions = (role) => {
         },
         {
           link: "/users",
-          title: role < 1 ? "Users List" : "Delete account",
+          title: role < rolesMapping.Admin ? "Users List" : "Delete account",
           key: 9,
         },
       ],
@@ -95,7 +96,9 @@ export const getNavOptions = (role) => {
     },
   ];
 
-  return options.filter((el) => (role > 1 ? el.link !== `/users` : true));
+  return options.filter((el) =>
+    role > rolesMapping.Admin ? el.link !== `/users` : true
+  );
 };
 
 export const rootSubmenuKeys = ["sub1", "sub2", "sub3", "sub4"];
